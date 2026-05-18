@@ -12,7 +12,7 @@ namespace EmployeeService.Repositories
 
         public EmployeeRepository()
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["AdoNetDb"].ConnectionString;
+            _connectionString = ConfigurationManager.ConnectionStrings["DbServer"].ConnectionString;
         }
 
         public Employee GetEmployeeById(int id)

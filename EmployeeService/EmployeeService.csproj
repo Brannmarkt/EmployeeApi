@@ -106,6 +106,7 @@
     <Content Include="App_Data\TestDb_log.ldf">
       <DependentUpon>TestDb.mdf</DependentUpon>
     </Content>
+    <Content Include="Database\Init.sql" />
     <Content Include="EmployeeService.svc" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
