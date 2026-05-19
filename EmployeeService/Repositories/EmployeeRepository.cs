@@ -1,4 +1,5 @@
 ﻿using EmployeeService.Models;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -17,11 +18,13 @@ namespace EmployeeService.Repositories
 
         public Employee GetEmployeeById(int id)
         {
-            var allFetchedEmployees = new List<Employee>();
+            var employees = new List<Employee>();
 
-            using (var connection = new SqlConnection(_connectionString))
+            try
             {
-                string query = @"
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    string query = @"
                     WITH EmployeeTree AS (
                         SELECT ID, Name, ManagerID, Enable 
                         FROM Employee WHERE ID = @Id
@@ -32,45 +35,57 @@ namespace EmployeeService.Repositories
                     )
                     SELECT ID, Name, ManagerID, Enable FROM EmployeeTree;";
 
-                using (var command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Id", id);
-                    connection.Open();
-
-                    using (var reader = command.ExecuteReader())
+                    using (var command = new SqlCommand(query, connection))
                     {
-                        while (reader.Read())
+                        command.Parameters.AddWithValue("@Id", id);
+                        connection.Open();
+
+                        using (var reader = command.ExecuteReader())
                         {
-                            allFetchedEmployees.Add(new Employee
+                            while (reader.Read())
                             {
-                                ID = reader.GetInt32(0),
-                                Name = reader.GetString(1),
-                                ManagerID = reader.IsDBNull(2) ? 0 : reader.GetInt32(2),
-                                Enable = reader.GetBoolean(3)
-                            });
+                                employees.Add(new Employee
+                                {
+                                    ID = reader.GetInt32(0),
+                                    Name = reader.GetString(1),
+                                    ManagerID = reader.IsDBNull(2) ? 0 : reader.GetInt32(2),
+                                    Enable = reader.GetBoolean(3)
+                                });
+                            }
                         }
                     }
                 }
             }
+            catch(SqlException ex)
+            {
+                throw new Exception("Database connection error", ex);
+            }
 
-            return BuildTree(allFetchedEmployees, id);
+            return BuildTree(employees, id);
         }
 
         public void EnableEmployee(int id, int enable)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            try
             {
-                string query = "UPDATE Employee SET Enable = @Enable WHERE ID = @Id";
-                using (var command = new SqlCommand(query, connection))
+                using (var connection = new SqlConnection(_connectionString))
                 {
-                    bool isEnabled = enable != 0;
+                    string query = "UPDATE Employee SET Enable = @Enable WHERE ID = @Id";
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        bool isEnabled = enable != 0;
 
-                    command.Parameters.AddWithValue("@Enable", isEnabled);
-                    command.Parameters.AddWithValue("@Id", id);
+                        command.Parameters.AddWithValue("@Enable", isEnabled);
+                        command.Parameters.AddWithValue("@Id", id);
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
                 }
+            }
+            catch(SqlException ex)
+            {
+                throw new Exception("Database connection error.", ex);
             }
         }
 
@@ -91,11 +106,11 @@ namespace EmployeeService.Repositories
             return root;
         }
 
-        private void AttachEmployees(Employee node, ILookup<int, Employee> lookup)
+        private void AttachEmployees(Employee rootEmployee, ILookup<int, Employee> lookup)
         {
-            node.Employees = lookup[node.ID].ToList();
+            rootEmployee.Employees = lookup[rootEmployee.ID].ToList();
 
-            foreach (var child in node.Employees)
+            foreach (var child in rootEmployee.Employees)
             {
                 AttachEmployees(child, lookup);
             }
