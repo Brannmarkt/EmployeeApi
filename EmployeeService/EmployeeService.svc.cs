@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.ServiceModel.Web;
+using System.Threading.Tasks;
 
 namespace EmployeeService
 {
@@ -11,7 +12,7 @@ namespace EmployeeService
     {
         private readonly EmployeeRepository _repository = new EmployeeRepository();
 
-        public Employee GetEmployeeById(int id)
+        public async Task<Employee> GetEmployeeById(int id)
         {
             if (id <= 0)
             {
@@ -20,7 +21,7 @@ namespace EmployeeService
 
             try
             {
-                var employee = _repository.GetEmployeeById(id);
+                var employee = await _repository.GetEmployeeById(id);
 
                 if (employee == null)
                 {
@@ -35,7 +36,7 @@ namespace EmployeeService
             }
         }
 
-        public void EnableEmployee(int id, int enable)
+        public async Task EnableEmployee(int id, int enable)
         {
             if (id <= 0)
             {
@@ -49,7 +50,7 @@ namespace EmployeeService
 
             try
             {
-                _repository.EnableEmployee(id, enable);
+                await _repository.EnableEmployee(id, enable);
             }
             catch (KeyNotFoundException ex)
             {

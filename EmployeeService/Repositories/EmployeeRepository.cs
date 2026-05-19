@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace EmployeeService.Repositories
 {
@@ -16,7 +17,7 @@ namespace EmployeeService.Repositories
             _connectionString = ConfigurationManager.ConnectionStrings["DbServer"].ConnectionString;
         }
 
-        public Employee GetEmployeeById(int id)
+        public async Task<Employee> GetEmployeeById(int id)
         {
             var employees = new List<Employee>();
 
@@ -38,11 +39,11 @@ namespace EmployeeService.Repositories
                     using (var command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", id);
-                        connection.Open();
+                        await connection.OpenAsync();
 
-                        using (var reader = command.ExecuteReader())
+                        using (var reader = await  command.ExecuteReaderAsync())
                         {
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 employees.Add(new Employee
                                 {
@@ -64,7 +65,7 @@ namespace EmployeeService.Repositories
             return BuildTree(employees, id);
         }
 
-        public void EnableEmployee(int id, int enable)
+        public async Task EnableEmployee(int id, int enable)
         {
             try
             {
@@ -78,8 +79,8 @@ namespace EmployeeService.Repositories
                         command.Parameters.AddWithValue("@Enable", isEnabled);
                         command.Parameters.AddWithValue("@Id", id);
 
-                        connection.Open();
-                        command.ExecuteNonQuery();
+                        await connection.OpenAsync();
+                        await command.ExecuteNonQueryAsync();
                     }
                 }
             }
