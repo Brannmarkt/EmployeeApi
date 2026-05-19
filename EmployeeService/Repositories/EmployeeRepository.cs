@@ -85,7 +85,7 @@ namespace EmployeeService.Repositories
             }
             catch(SqlException ex)
             {
-                throw new Exception("Database connection error.", ex);
+                throw new Exception("Database connection error", ex);
             }
         }
 
