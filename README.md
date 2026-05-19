@@ -26,7 +26,7 @@ git clone https://github.com/Brannmarkt/EmployeeApi.git
 3) Run the application
 
 ## Testing
-You can test the API using Postman or any other REST client. Replace <PORT> with your own.
+You can test the API using Postman. Replace <PORT> with your own.
 
 1) Get Employee Hierarchy (GET)
 Returns the employee and all their subordinates in a JSON.
@@ -45,7 +45,6 @@ http://localhost:<PORT>/EmployeeService.svc/EnableEmployee?id=3
 Body (Raw JSON):
 
 ```bash
-JSON
 {
     "enable": 0
 }
