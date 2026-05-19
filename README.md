@@ -39,7 +39,7 @@ http://localhost:<PORT>/EmployeeService.svc/GetEmployeeById?id={id}
 Updates the Enable property of an employee.
 
 ```bash
-http://localhost:<PORT>/EmployeeService.svc/EnableEmployee?id=3
+http://localhost:<PORT>/EmployeeService.svc/EnableEmployee?id={id}
 ```
 
 Body (Raw JSON):
